@@ -1,4 +1,8 @@
-use std::f32;
+use std::{
+    cell::RefCell,
+    collections::{BTreeSet, HashSet},
+    f32,
+};
 
 use macroquad::{math::vec2, window::screen_width};
 
@@ -8,13 +12,13 @@ pub enum Orientation {
     Vertical,
 }
 
-pub struct Layout {
-    widgets: Vec<*mut dyn Widget>,
+pub struct Layout<'a> {
+    widgets: Vec<&'a dyn Widget>,
     orientation: Orientation,
     gap: f32,
 }
 
-impl Layout {
+impl<'a> Layout<'a> {
     pub fn new(orientation: Orientation) -> Self {
         Self {
             widgets: Vec::new(),
@@ -23,21 +27,24 @@ impl Layout {
         }
     }
 
-    pub fn add_widget<T: Widget>(&mut self, widget: &mut T) {
-        self.widgets.push(widget as *mut T as *mut dyn Widget);
+    pub fn add_widget<T: Widget>(&mut self, widget: &'a T) {
+        self.widgets.push(widget);
+
+        // if !success {
+        //     panic!("Attempted to insert an already present widget.")
+        // }
     }
 
     pub fn draw(&self) {
         let mut gap = self.gap;
 
         for widget in &self.widgets {
-            unsafe {
-                let x = screen_width() - (**widget).get_size().x;
-                (**widget).set_pos(vec2(x / 2., gap));
+            let size = widget.get_size();
+            let x = screen_width() - size.x;
+            widget.set_pos(vec2(x / 2., gap));
 
-                gap += (**widget).get_size().y + self.gap;
-                (**widget).draw();
-            }
+            gap += size.y + self.gap;
+            widget.draw();
         }
     }
 }

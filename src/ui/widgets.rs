@@ -2,6 +2,6 @@ use macroquad::prelude::*;
 
 pub trait Widget {
     fn draw(&self);
-    fn set_pos(&mut self, new_pos: Vec2);
+    fn set_pos(&self, new_pos: Vec2);
     fn get_size(&self) -> Vec2;
 }

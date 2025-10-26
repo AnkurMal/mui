@@ -1,26 +1,25 @@
 mod ui;
 
 use anyhow::Result;
+use lazy_static::lazy_static;
 use macroquad::prelude::*;
 use ui::*;
+
+load_font!(FONT, "../assets/fonts/Alegreya-Regular.ttf");
 
 #[macroquad::main(window_conf)]
 async fn main() -> Result<()> {
     let mut count = 0;
 
-    let mut font =
-        load_ttf_font_from_bytes(include_bytes!("../assets/fonts/Alegreya-Regular.ttf"))?;
-    font.set_filter(FilterMode::Nearest);
+    let btn = button_new!("Count++", FONT, color = BLUE);
+    let btn2 = button_new!("Count--", FONT, color = BLUE);
 
-    let mut btn = button_new!("Count++", &font, color = BLUE);
-    let mut btn2 = button_new!("Count--", &font, color = BLUE);
-
-    let mut label = label_new!(format!("Count is: {count}"), &font);
+    let label = label_new!(format!("Count is: {count}"), FONT);
 
     let mut layout = Layout::new(Orientation::Vertical);
-    layout.add_widget(&mut btn);
-    layout.add_widget(&mut btn2);
-    layout.add_widget(&mut label);
+    layout.add_widget(&btn);
+    layout.add_widget(&btn2);
+    layout.add_widget(&label);
 
     loop {
         if is_key_pressed(KeyCode::Escape) {
